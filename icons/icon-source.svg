@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Atlas app icon</title>
+  <desc id="desc">A deep rose compass and search symbol on a soft rose background.</desc>
+  <rect width="512" height="512" fill="#EFB3C1"/>
+  <circle cx="230" cy="226" r="132" fill="#FDF7F8" stroke="#8A4257" stroke-width="30"/>
+  <path d="M324 320 428 424" fill="none" stroke="#8A4257" stroke-width="42" stroke-linecap="round"/>
+  <path d="m174 282 40-96 96-40-40 96-96 40Z" fill="#FBE4EA" stroke="#8A4257" stroke-width="22" stroke-linejoin="round"/>
+  <circle cx="254" cy="202" r="18" fill="#8A4257"/>
+</svg>

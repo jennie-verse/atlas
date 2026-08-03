@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#FDF7F8">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Atlas">
+  <meta name="description" content="Search across your personal app data and copy results in one tap.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.github.com; font-src 'self'; img-src 'self' data:; manifest-src 'self'; object-src 'none'; script-src 'self'; style-src 'self'; base-uri 'none'; form-action 'none'">
+  <title>Atlas</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="icon" href="./icons/icon-192.png" sizes="192x192">
+  <link rel="icon" href="./icons/icon-512.png" sizes="512x512">
+  <link rel="stylesheet" href="./assets/app.css?v=2">
+</head>
+<body>
+  <div class="app-shell">
+    <main id="main-view" class="view" aria-labelledby="app-title">
+      <header class="app-header">
+        <div class="brand-block">
+          <div class="brand-row">
+            <svg class="brand-mark" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="21" cy="21" r="15.5"></circle>
+              <path d="m31.5 31.5 10 10"></path>
+              <path class="brand-needle" d="m16.4 25.6 4.1-9.1 9.1-4.1-4.1 9.1-9.1 4.1Z"></path>
+              <circle class="brand-center" cx="23" cy="19" r="1.6"></circle>
+            </svg>
+            <h1 id="app-title">Atlas</h1>
+          </div>
+          <p>Search across your personal apps</p>
+        </div>
+        <button id="open-settings" class="icon-button" type="button" aria-label="Open settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 15.25A3.25 3.25 0 1 0 12 8.75a3.25 3.25 0 0 0 0 6.5Z"></path>
+            <path d="m19.4 15 .9 1.55-2 2-.05.05-1.6-.9a7.9 7.9 0 0 1-1.65.7l-.5 1.8h-5l-.5-1.8a7.9 7.9 0 0 1-1.65-.7l-1.6.9-2.05-2.05L4.6 15a7.9 7.9 0 0 1-.7-1.7l-1.8-.5v-2.9l1.8-.5a7.9 7.9 0 0 1 .7-1.7l-.9-1.55 2.05-2.05 1.6.9A7.9 7.9 0 0 1 9 4.3l.5-1.8h5l.5 1.8a7.9 7.9 0 0 1 1.65.7l1.6-.9 2.05 2.05-.9 1.55c.3.55.53 1.12.7 1.7l1.8.5v2.9l-1.8.5a7.9 7.9 0 0 1-.7 1.7Z"></path>
+          </svg>
+        </button>
+      </header>
+
+      <section class="search-section" aria-label="Search">
+        <label class="sr-only" for="search-input">Search text or labels</label>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+            <path d="m15.4 15.4 5.1 5.1"></path>
+          </svg>
+          <input id="search-input" type="search" placeholder="Search text or labels" autocomplete="off" autocapitalize="none" spellcheck="false">
+          <button id="clear-search" class="clear-search" type="button" aria-label="Clear search" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7.5 7.5 9 9m0-9-9 9"></path></svg>
+          </button>
+        </div>
+      </section>
+
+      <div id="connection-banner" class="status-banner" role="status" hidden></div>
+
+      <section class="results-section" aria-labelledby="results-heading">
+        <div class="results-meta">
+          <div>
+            <h2 id="results-heading">Recent</h2>
+            <p id="results-summary" aria-live="polite">Loading cached data…</p>
+          </div>
+          <span id="refresh-indicator" class="refresh-indicator" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+            Refreshing
+          </span>
+        </div>
+        <div id="results-list" class="results-list"></div>
+        <div id="empty-state" class="empty-state" hidden>
+          <svg viewBox="0 0 56 56" aria-hidden="true">
+            <circle cx="24" cy="24" r="15"></circle>
+            <path d="m35 35 11 11"></path>
+            <path d="M18 24h12M24 18v12"></path>
+          </svg>
+          <h2 id="empty-title">Connect Atlas</h2>
+          <p id="empty-message">Add a read-only GitHub token in Settings, then refresh your data.</p>
+          <button id="empty-settings" class="primary-button" type="button">Open Settings</button>
+        </div>
+      </section>
+    </main>
+
+    <section id="settings-view" class="view settings-view" aria-labelledby="settings-title" hidden>
+      <header class="settings-header">
+        <button id="close-settings" class="icon-button back-button" type="button" aria-label="Back to search">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7"></path></svg>
+        </button>
+        <h1 id="settings-title">Settings</h1>
+        <span class="header-spacer" aria-hidden="true"></span>
+      </header>
+
+      <div class="settings-content">
+        <section class="settings-section" aria-labelledby="access-heading">
+          <h2 id="access-heading">GitHub access</h2>
+          <div class="setting-body">
+            <label for="token-input">Personal access token</label>
+            <input id="token-input" type="password" autocomplete="new-password" autocapitalize="none" spellcheck="false" placeholder="Enter a token">
+            <p id="token-status" class="field-note">No token saved.</p>
+            <div class="button-row">
+              <button id="save-token" class="primary-button" type="button">Save</button>
+              <button id="clear-token" class="secondary-button danger-button" type="button">Clear</button>
+            </div>
+            <p class="guidance">atlas only reads data. A separate token with Contents: Read-only permission is recommended.</p>
+          </div>
+        </section>
+
+        <section class="settings-section" aria-labelledby="data-heading">
+          <h2 id="data-heading">Data</h2>
+          <div class="setting-body">
+            <button id="refresh-data" class="secondary-button full-width-button" type="button">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.35 5.65M20 4v7h-7"></path></svg>
+              <span>Refresh</span>
+            </button>
+            <dl class="status-list">
+              <div>
+                <dt>Last refreshed</dt>
+                <dd id="last-refreshed">Never</dd>
+              </div>
+              <div>
+                <dt>Last error</dt>
+                <dd id="last-error">No errors</dd>
+              </div>
+            </dl>
+          </div>
+        </section>
+
+        <section class="settings-section" aria-labelledby="text-size-heading">
+          <h2 id="text-size-heading">Text size</h2>
+          <div class="setting-body">
+            <div id="font-size-options" class="size-options" role="radiogroup" aria-label="Text size">
+              <button type="button" role="radio" aria-checked="false" data-size="6">6<span class="sr-only"> pixels</span></button>
+              <button type="button" role="radio" aria-checked="false" data-size="8">8<span class="sr-only"> pixels</span></button>
+              <button type="button" role="radio" aria-checked="false" data-size="10">10<span class="sr-only"> pixels</span></button>
+              <button type="button" role="radio" aria-checked="true" data-size="12">12<span class="sr-only"> pixels</span></button>
+              <button type="button" role="radio" aria-checked="false" data-size="14">14<span class="sr-only"> pixels</span></button>
+              <button type="button" role="radio" aria-checked="false" data-size="17">17<span class="sr-only"> pixels</span></button>
+            </div>
+            <button id="reset-size" class="secondary-button full-width-button" type="button">Reset</button>
+          </div>
+        </section>
+      </div>
+      <p class="settings-footer">Settings stay on this device.</p>
+    </section>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+  <script type="module" src="./src/app.js"></script>
+</body>
+</html>
