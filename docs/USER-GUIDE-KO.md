@@ -24,7 +24,7 @@
 ## 복사하고 원래 앱 열기
 
 - 결과의 본문 영역을 누르면 전체 클립 원문이 클립보드에 복사되고 `Copied` 토스트가 나타납니다.
-- 오른쪽의 열기 버튼을 누르면 같은 탭에서 원래 앱(현재는 `clip`)을 엽니다.
+- 오른쪽의 열기 버튼을 누르면 같은 탭에서 Tide를 엽니다.
 - Safari가 클립보드 권한을 허용하지 않으면 복사 실패 안내가 표시됩니다. 이 경우 결과 글자를 길게 눌러 수동으로 선택·복사하세요.
 
 ## 글자 크기 바꾸기
@@ -57,7 +57,8 @@
 - `Token may be expired or lacks permission`: 토큰이 만료되었거나 `webapp-data` 저장소의 Contents: Read-only 권한이 없습니다. 새 토큰을 저장한 뒤 Refresh를 다시 누르세요.
 - `Network request failed. Cached data is still available.`: 네트워크 연결을 확인하세요. 기존 캐시는 계속 사용할 수 있습니다.
 - `Skipped unreadable files: 파일명`: 표시된 JSON 파일을 파싱하지 못했습니다. GitHub 저장소에서 해당 파일의 JSON 형식과 `items`, `deleted` 배열을 확인하세요.
-- `No data found`: 토큰과 권한이 맞는지 확인하고 Refresh를 누르세요. `webapp-data` 루트에 `clip/` 폴더와 `data.<contextId>.json` 파일이 있는지도 확인하세요.
+- `No data found`: 토큰과 권한이 맞는지 확인하고 Refresh를 누르세요. `webapp-data` 루트에 `tide/archive/` 폴더와 `YYYY-MM.json` 파일이 있는지도 확인하세요.
+- **Tide에서 방금 담은 항목은 검색되지 않는 것이 정상입니다.** Tide는 마지막으로 손댄 뒤 7일이 지나 만료된 항목만 저장소에 보관합니다. Atlas는 그렇게 흘려보낸 기록을 다시 찾는 검색기입니다. 핀(Pin)을 꽂은 항목은 만료되지 않으므로 Atlas에도 올라오지 않습니다.
 - `Copy failed…`: Safari의 클립보드 접근이 차단되었습니다. HTTPS 주소에서 실행 중인지 확인하고 결과를 길게 눌러 수동 복사하세요.
 
 ## 홈 화면에 추가하기

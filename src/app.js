@@ -17,8 +17,84 @@ const DEFAULT_FONT_SIZE = 12;
 const RECENT_LIMIT = 20;
 
 const PARSERS = Object.freeze({
+  // tide 는 현재 운영 중인 데이터원입니다.
+  // 만료된 항목만 tide/archive/<YYYY-MM>.json 배열로 쌓입니다.
+  // 레코드 모양: { id, kind: 'clip'|'dump', text, createdAt, archivedAt }
+  tide: Object.freeze({
+    appUrl: '../tide/',
+    async listFiles(config, folderPath) {
+      const entries = await Sync.listDir(config, `${folderPath}/archive`);
+      return entries.filter((entry) => (
+        entry.type === 'file' && /^\d{4}-\d{2}\.json$/.test(entry.name)
+      ));
+    },
+    parse(files) {
+      const newestItems = new Map();
+      const errors = [];
+
+      for (const file of files) {
+        let payload;
+        try {
+          payload = JSON.parse(file.content);
+          if (!Array.isArray(payload)) {
+            throw new TypeError('Unexpected tide archive shape');
+          }
+        } catch {
+          errors.push(file.name);
+          continue;
+        }
+
+        for (const rawItem of payload) {
+          if (!rawItem || typeof rawItem !== 'object' || typeof rawItem.id !== 'string' || typeof rawItem.text !== 'string') {
+            continue;
+          }
+
+          const item = {
+            id: rawItem.id,
+            text: rawItem.text,
+            kind: rawItem.kind === 'dump' ? 'dump' : 'clip',
+            createdAt: validIsoString(rawItem.createdAt),
+            archivedAt: validIsoString(rawItem.archivedAt)
+          };
+
+          // 같은 id 가 여러 달 파일에 남아 있으면 가장 나중에 보관된 것을 씁니다.
+          const previous = newestItems.get(item.id);
+          if (!previous || dateValue(item.archivedAt) > dateValue(previous.archivedAt)) {
+            newestItems.set(item.id, item);
+          }
+        }
+      }
+
+      const items = [];
+      for (const item of newestItems.values()) {
+        const firstLine = item.text.split(/\r?\n/, 1)[0].trim();
+        items.push({
+          id: item.id,
+          title: firstLine || (item.kind === 'dump' ? 'Untitled note' : 'Untitled clip'),
+          snippet: item.text,
+          date: item.archivedAt || item.createdAt,
+          source: 'tide',
+          text: item.text,
+          label: item.kind === 'dump' ? 'Dump' : 'Clip',
+          pinned: false,
+          appUrl: '../tide/'
+        });
+      }
+
+      return { items, errors };
+    }
+  }),
+  // clip 은 은퇴한 앱입니다. webapp-data 의 clip/ 폴더가 남아 있는 동안에만
+  // 과거 기록을 계속 검색할 수 있도록 파서를 유지합니다.
+  // clip/ 폴더를 지우면 listDir 이 빈 배열을 돌려주므로 이 파서는 조용히 비활성화됩니다.
   clip: Object.freeze({
-    appUrl: '../clip/',
+    appUrl: '../tide/',
+    async listFiles(config, folderPath) {
+      const entries = await Sync.listDir(config, folderPath);
+      return entries.filter((entry) => (
+        entry.type === 'file' && /^data\.[^/]+\.json$/i.test(entry.name)
+      ));
+    },
     parse(files) {
       const newestItems = new Map();
       const newestTombstones = new Map();
@@ -85,7 +161,7 @@ const PARSERS = Object.freeze({
           text: item.text,
           label: item.label,
           pinned: item.pinned,
-          appUrl: '../clip/'
+          appUrl: '../tide/'
         });
       }
 
@@ -180,7 +256,7 @@ function sanitizeCachedItem(rawItem) {
     return null;
   }
 
-  const source = typeof rawItem.source === 'string' && PARSERS[rawItem.source] ? rawItem.source : 'clip';
+  const source = typeof rawItem.source === 'string' && PARSERS[rawItem.source] ? rawItem.source : 'tide';
   return {
     id: rawItem.id,
     title: typeof rawItem.title === 'string' ? rawItem.title : '',
@@ -452,10 +528,7 @@ function errorMessage(error) {
 
 async function loadFolder(config, folderEntry) {
   const parser = PARSERS[folderEntry.name];
-  const entries = await Sync.listDir(config, folderEntry.path);
-  const jsonEntries = entries.filter((entry) => (
-    entry.type === 'file' && /^data\.[^/]+\.json$/i.test(entry.name)
-  ));
+  const jsonEntries = await parser.listFiles(config, folderEntry.path);
 
   const files = (await Promise.all(jsonEntries.map(async (entry) => {
     const file = await Sync.readFile(config, entry.path);
