@@ -1,4 +1,4 @@
-const CACHE_NAME = 'atlas-v5';
+const CACHE_NAME = 'atlas-v6';
 
 const PRECACHE_URLS = [
   './',

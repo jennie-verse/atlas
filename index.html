@@ -77,7 +77,7 @@
             <path d="M18 24h12M24 18v12"></path>
           </svg>
           <h2 id="empty-title">Connect Atlas</h2>
-          <p id="empty-message">Add a read-only GitHub token in Settings, then refresh your data.</p>
+          <p id="empty-message">Add a GitHub token in Settings, then refresh your data.</p>
           <button id="empty-settings" class="primary-button" type="button">Open Settings</button>
         </div>
       </section>
@@ -103,7 +103,7 @@
               <button id="save-token" class="primary-button" type="button">Save</button>
               <button id="clear-token" class="secondary-button danger-button" type="button">Clear</button>
             </div>
-            <p class="guidance">atlas only reads data. A separate token with Contents: Read-only permission is recommended.</p>
+            <p class="guidance">This token is shared with Tide and Trace — they all read the same saved token. Atlas itself only reads, but Tide and Trace write, so the token needs Contents: Read and write. Saving or clearing it here changes it for all three apps.</p>
           </div>
         </section>
 

@@ -437,7 +437,7 @@ function renderResults() {
     elements.emptySettings.hidden = true;
   } else if (!token) {
     elements.emptyTitle.textContent = 'Connect Atlas';
-    elements.emptyMessage.textContent = 'Add a read-only GitHub token in Settings, then refresh your data.';
+    elements.emptyMessage.textContent = 'Add a GitHub token in Settings, then refresh your data.';
     elements.emptySettings.hidden = false;
   } else {
     elements.emptyTitle.textContent = 'No data found';
@@ -634,7 +634,9 @@ function saveToken() {
 
 function clearToken() {
   if (!readStorage(STORAGE_KEYS.token)) return;
-  if (!window.confirm('Clear the saved token? Cached search data will remain.')) return;
+  // The token lives under one key on this origin, so Tide and Trace read the same
+  // value. Clearing it here signs those apps out of sync too — say so up front.
+  if (!window.confirm('Clear the saved token?\n\nTide and Trace share this token, so their sync will stop until a token is saved again. Cached search data will remain.')) return;
 
   if (!removeStorage(STORAGE_KEYS.token)) {
     showToast('The token could not be cleared.', true);
