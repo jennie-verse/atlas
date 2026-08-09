@@ -1,6 +1,34 @@
 # Atlas
 
-Atlas는 여러 개인용 웹앱이 GitHub 비공개 저장소 `webapp-data`에 저장한 JSON 데이터를 한곳에서 검색하는 정적 웹앱입니다. 현재는 `tide/`(운영 중)와 `clip/`(은퇴, 과거 기록) 데이터를 지원하며, 검색 결과를 누르면 원문을 클립보드에 복사합니다.
+Atlas는 여러 개인용 웹앱이 GitHub 비공개 저장소 `webapp-data`에 저장한 JSON 데이터를 한곳에서 검색하는 정적 웹앱입니다. `tide/`(운영 중), `clip/`(은퇴, 과거 기록), 그리고 앱들이 공통 모양으로 남기는 `events/` 기록을 지원하며, 검색 결과를 누르면 원문을 클립보드에 복사합니다.
+
+## 데이터원 (파서)
+
+| 파서 | 읽는 경로 | 상태 |
+|---|---|---|
+| `tide` | `tide/archive/<YYYY-MM>.json` | 운영 중 |
+| `clip` | `clip/data.<기기>.json` | 은퇴한 앱의 과거 기록 (읽기만) |
+| `events` | `events/<앱>.<기기>.<YYYY-MM>.json` | 운영 중 (공용) |
+
+`webapp-data`에 해당 폴더가 없으면 그 파서는 조용히 비활성화됩니다.
+
+### events 파서 — 앱마다 파서를 새로 만들지 않기 위한 층
+
+앱이 늘어날 때마다 Atlas에 파서를 하나씩 더하면, 앱이 데이터 모양을 바꿀 때마다 Atlas도 같이 고쳐야 합니다. 그래서 각 앱이 **정해진 한 가지 모양**으로 활동 기록을 남기고, Atlas는 그 모양만 읽습니다. 앞으로 focus·loom·grove·vault가 여기에 기록을 남겨도 Atlas 코드는 그대로입니다.
+
+```json
+{ "v": 1, "id": "focus:1a2b3c4d", "app": "focus", "kind": "session.completed",
+  "at": "2026-08-09T14:03:00+09:00", "title": "Finished a 25-min focus session",
+  "detail": "딥워크 블록", "ref": "../focus/" }
+```
+
+- 검색 대상은 `title` 과 `detail` 입니다. 결과의 뱃지에는 `app` 값이, 여는 버튼에는 `ref` 가 쓰입니다.
+- `ref` 는 `../<앱이름>/` 모양일 때만 링크로 만듭니다. 데이터 파일이 조작되어도 `javascript:` 나 외부 주소가 링크로 들어가지 못합니다. `ref` 가 없으면 링크 없이 복사만 됩니다.
+- `v` 가 `1` 이 아닌 레코드, `at` 이 날짜가 아닌 레코드, `title` 이 빈 레코드는 조용히 건너뜁니다.
+- 같은 `id` 가 여러 번 나오면 마지막 것을 씁니다. `"deleted": true` 로 뒤에 붙은 것은 목록에서 빠집니다.
+- 파일 이름이 `<앱>.<기기>.<YYYY-MM>.json` 모양이 아닌 항목(`.gitkeep` 등)은 무시합니다.
+
+**읽는 범위는 기본 최근 3개월입니다.** 이벤트 파일은 앱 × 기기 × 달마다 하나씩 생기므로, 제한이 없으면 새로고침 한 번에 GitHub 요청이 수백 회로 늘어납니다. Settings의 `Load 3 more months` 를 누르면 3개월씩, 최대 24개월까지 넓힐 수 있고 넓힌 범위는 저장됩니다.
 
 빌드 도구나 서버가 필요하지 않습니다. `atlas/` 폴더를 그대로 GitHub Pages에 올리면 `https://jennie-verse.github.io/atlas/` 하위 경로에서 실행됩니다. 데이터 요청은 공용 모듈 `../shared/v1/sync.js`를 통해 `api.github.com`에만 전송됩니다.
 
