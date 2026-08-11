@@ -1,7 +1,7 @@
 # Atlas — Test Report
 
 검토일: 2026-08-03
-검토 방식: 로컬 정적 서버(`python3 -m http.server`, `Deliverable/` 루트에서 실행)로 `http://localhost:4175/atlas/`를 열어 확인. `../shared/v1/sync.js` 상대 경로가 GitHub Pages와 동일한 폴더 구조(`Deliverable/atlas`, `Deliverable/shared`)에서 정상 해석되는 것을 전제로 함.
+당시 검토 방식: 2026-08-03에는 별도 `Deliverable/` staging에서 확인했습니다. 현재 재실행할 때는 `WebApp/Published/`에서 `python3 -m http.server 4175`를 실행하고 `http://localhost:4175/atlas/`를 엽니다. 이 구조에서 `atlas/`와 `shared/`가 형제 폴더가 되어 실제 GitHub Pages의 `../shared/v1/sync.js` 경로를 그대로 재현합니다.
 
 ## 1. 코드 검토에서 발견해 고친 문제
 
@@ -22,7 +22,7 @@ ChatGPT가 만든 원본 코드 자체에는 아래 항목에서 **결함이 없
 1. **폰트**: `Published/focus/public/fonts/lexend-400.woff2`, `lexend-700.woff2`를 `atlas/fonts/`에 복사. 라이선스 `Published/petal/licenses/Lexend-OFL.txt`를 `atlas/licenses/`에 복사.
 2. **아이콘**: `icons/icon-source.svg`를 `rsvg-convert`로 180×180(`apple-touch-icon.png`), 192×192(`icon-192.png`), 512×512(`icon-512.png`) PNG로 변환.
 3. **Service Worker**: `sw.js`의 `PRECACHE_URLS`에 새로 추가된 `licenses/Lexend-OFL.txt`를 반영하고, 캐시 내용이 바뀌었으므로 `CACHE_NAME`을 `atlas-v2` → `atlas-v3`로 올림 (이전 캐시 자동 제거).
-4. **테스트 서버 설정**: `.claude/launch.json`에 `atlas-preview`(포트 4175, `Deliverable/` 루트 기준 `python3 -m http.server`) 항목 추가 — GitHub Pages와 동일하게 `atlas/`와 `shared/`가 형제 폴더로 서빙되도록 구성.
+4. **당시 테스트 서버 설정**: `.claude/launch.json`의 `atlas-preview`는 2026-08-03 작업 환경에 있던 보조 설정입니다. 현재 저장소에는 포함되지 않으므로 위의 `Published/` 루트 명령을 사용합니다.
 
 ## 3. 통과 항목 (로컬 확인 완료)
 
